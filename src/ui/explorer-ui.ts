@@ -85,7 +85,7 @@ export class ExplorerUI {
 					targetLeaf.setViewState(preferred.viewState)
 						.then(() => {
 							// Always restore focus to the restored File Explorer leaf
-							this.app.workspace.setActiveLeaf(targetLeaf as WorkspaceLeaf, { focus: true });
+								this.app.workspace.setActiveLeaf(targetLeaf, { focus: true });
 						})
 						.catch((err) => {
 							console.error("[ExplorerUI] Error setting view state:", err);
