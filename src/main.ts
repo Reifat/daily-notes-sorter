@@ -42,7 +42,7 @@ export default class DailyNotesSorter extends Plugin {
 		this.fileExplorerUtils = new FileExplorerUtils(this.app, this, this.sorter, this.settings, this);
 		
 		// Initialize UI for FileExplorer
-		this.explorerUI = new ExplorerUI(this.fileExplorerUtils);
+		this.explorerUI = new ExplorerUI(this.app, this.fileExplorerUtils);
 
 		this.fileExplorerUtils.waitForFileExplorer((fileExplorer) => {
 			this.fileExplorerUtils.patchFileExplorerFolder(fileExplorer);
@@ -71,8 +71,10 @@ export default class DailyNotesSorter extends Plugin {
 		// - Setting tabs are automatically removed
 		// - Event listeners registered via this.registerEvent() are automatically removed
 		
-		// Explicit cleanup if needed (currently not required as all resources
-		// are managed through plugin.register() which handles cleanup automatically)
+		// Cleanup UI components (e.g., remove sort button from FileExplorer)
+		if (this.explorerUI) {
+			this.explorerUI.cleanup();
+		}
 	}
 
 	async loadSettings() {

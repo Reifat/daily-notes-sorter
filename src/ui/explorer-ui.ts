@@ -1,7 +1,8 @@
-import { FileExplorerView } from 'obsidian';
+import { App, FileExplorerView } from 'obsidian';
 import { FileExplorerUtils } from '../file-explorer-utils';
 
 export class ExplorerUI {
+	private app: App;
 	private fileExplorerUtils: FileExplorerUtils;
 
 	private readonly SORT_OPTIONS = [
@@ -9,7 +10,8 @@ export class ExplorerUI {
 		{ id: 'descending', label: 'Descending' }
 	];
 
-	constructor(fileExplorerUtils: FileExplorerUtils) {
+	constructor(app: App, fileExplorerUtils: FileExplorerUtils) {
+		this.app = app;
 		this.fileExplorerUtils = fileExplorerUtils;
 	}
 
@@ -39,6 +41,61 @@ export class ExplorerUI {
 			const button = fileExplorer.headerDom.navButtonsEl?.lastElementChild as HTMLElement;
 			button?.querySelector("svg")?.setAttribute("style", "color: #fff;");
 		}, 100);
+	}
+
+	/**
+	 * Cleans up the UI by reloading FileExplorer to remove the sort button
+	 * This is necessary because the button added via addSortButton() is not automatically removed
+	 */
+	cleanup(): void {
+		const fileExplorerLeaves = this.app.workspace.getLeavesOfType("file-explorer");
+		if (fileExplorerLeaves.length > 0) {
+			// Save the active leaf to restore focus after reload
+			const activeLeaf = this.app.workspace.activeLeaf;
+			const wasFileExplorerActive = fileExplorerLeaves.some(leaf => leaf === activeLeaf);
+			
+			// Save the view states before detaching
+			const leavesData = fileExplorerLeaves.map(leaf => ({
+				viewState: leaf.getViewState(),
+				wasActive: leaf === activeLeaf
+			}));
+			
+			// Detach all FileExplorer leaves
+			fileExplorerLeaves.forEach(leaf => {
+				leaf.detach();
+			});
+			
+			// Reopen FileExplorer leaves with saved state
+			// Use setTimeout to ensure detach completes before reopening
+			setTimeout(() => {
+				let restoredFileExplorerLeaf: any = null;
+				
+				leavesData.forEach((leafData) => {
+					// Try to restore to the same position
+					// For FileExplorer, try to use left leaf (most common case)
+					let targetLeaf = this.app.workspace.getLeftLeaf(false);
+					
+					// If left leaf is not available, create a new leaf
+					if (!targetLeaf) {
+						targetLeaf = this.app.workspace.getLeaf();
+					}
+					
+					if (targetLeaf) {
+						targetLeaf.setViewState(leafData.viewState);
+						
+						// Remember the restored FileExplorer leaf if it was active
+						if (wasFileExplorerActive && leafData.wasActive) {
+							restoredFileExplorerLeaf = targetLeaf;
+						}
+					}
+				});
+				
+				// Restore focus only if FileExplorer was active before detach
+				if (wasFileExplorerActive && restoredFileExplorerLeaf) {
+					this.app.workspace.setActiveLeaf(restoredFileExplorerLeaf, { focus: true });
+				}
+			}, 0);
+		}
 	}
 }
 
