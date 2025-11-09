@@ -11,10 +11,10 @@ export class FileExplorerUtils {
 	private plugin: Plugin;
 	private sorter: Sorter;
 	private settings: { items: FolderItem[]; sortAscending?: boolean };
-	private pluginInstance: any; // Reference to plugin instance for saving settings
+	private pluginInstance: { saveSettings: () => Promise<void> } | undefined; // Reference to plugin instance for saving settings
 	public sortAscending: boolean = true; // Public for access from closure
 
-	constructor(app: App, plugin: Plugin, sorter: Sorter, settings: { items: FolderItem[]; sortAscending?: boolean }, pluginInstance?: any) {
+	constructor(app: App, plugin: Plugin, sorter: Sorter, settings: { items: FolderItem[]; sortAscending?: boolean }, pluginInstance?: { saveSettings: () => Promise<void> }) {
 		this.app = app;
 		this.plugin = plugin;
 		this.sorter = sorter;
@@ -181,17 +181,17 @@ export class FileExplorerUtils {
 			if (requireApiVersion && requireApiVersion("1.6.0")) {
 				// Starting from Obsidian 1.6.0 the sorting mechanics has been significantly refactored internally in Obsidian
 				const uninstallerOfFolderSortFunctionWrapper: MonkeyAroundUninstaller = around(patchableFileExplorer.constructor.prototype, {
-					getSortedFolderItems(old: any) {
-                        return function (this: any, ...args: any[]) {
-							const folderPath = args[0].path;
+					getSortedFolderItems(old: (folder: TFolder) => unknown[]) {
+                        return function (this: FileExplorerView, folder: TFolder): unknown[] {
+							const folderPath = folder.path;
 							const folderSettings = utils.getFolderSettings(folderPath);				
 							if (folderSettings) {
 								const ascending = utils.sortAscending;
 								const dateFormat = folderSettings.dateFormat;
-								return utils.sorter.sortFolder(args[0], this.fileItems, ascending, dateFormat);
+								return utils.sorter.sortFolder(folder, this.fileItems as Record<string, unknown>, ascending, dateFormat);
 							}
 							else { // default sort
-								return old.call(this, ...args);
+								return old.call(this, folder);
 							}
 						};
 					}
@@ -203,17 +203,17 @@ export class FileExplorerUtils {
 				const tmpFolder = this.app.vault.getRoot();
 				let Folder = patchableFileExplorer.createFolderDom(tmpFolder).constructor;
 				const uninstallerOfFolderSortFunctionWrapper: MonkeyAroundUninstaller = around(Folder.prototype, {
-					sort(old: any) {
-						return function (this: any, ...args: any[]) {
-							const folderPath = args[0].path;
+					sort(old: (folder: TFolder) => unknown[]) {
+						return function (this: { fileItems: Record<string, unknown> }, folder: TFolder): unknown[] {
+							const folderPath = folder.path;
 							const folderSettings = utils.getFolderSettings(folderPath);						
 							if (folderSettings) {
 								const ascending = utils.sortAscending;
 								const dateFormat = folderSettings.dateFormat;
-								return utils.sorter.sortFolder(args[0], this.fileItems, ascending, dateFormat);
+								return utils.sorter.sortFolder(folder, this.fileItems, ascending, dateFormat);
 							}
 							else { // default sort
-								return old.call(this, ...args);
+								return old.call(this, folder);
 							}
 						};
 					}

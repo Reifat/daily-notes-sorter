@@ -1,7 +1,6 @@
 import { 
 	App,
-	Plugin,
-	FileExplorerView } from 'obsidian';
+	Plugin } from 'obsidian';
 
 import { SorterSettings } from './ui/settings';
 import { Sorter } from './core/sorter';
@@ -9,32 +8,7 @@ import { FileExplorerUtils } from './file-explorer-utils';
 import { ExplorerUI } from './ui/explorer-ui';
 
 
-import type moment from "moment";
-
 const DEFAULT_DAILY_NOTE_FORMAT = "YYYY-MM-DD";
-declare global {
-	interface Window {
-	  app: App;
-	  moment: typeof moment;
-	}
-  }
- interface IPeriodicNoteSettings {
-	folder?: string;
-	format?: string;
-	template?: string;
-  }
-
-  function getDailyNoteSettings(): IPeriodicNoteSettings {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const { internalPlugins, plugins } = <any>window.app;
-	const { folder, format, template } =
-	internalPlugins.getPluginById("daily-notes")?.instance?.options || {};
-	return {
-	format: format || DEFAULT_DAILY_NOTE_FORMAT,
-	folder: folder?.trim() || "",
-	template: template?.trim() || "",
-	};
-}
 
 export interface FolderItem {
     path: string;
@@ -111,7 +85,7 @@ export default class DailyNotesSorter extends Plugin {
 			// If there is loaded data, apply it
 			if (loadedData) {
 				if (loadedData.items && Array.isArray(loadedData.items)) {
-					this.settings.items = loadedData.items.map((item: any) => ({
+					this.settings.items = loadedData.items.map((item: { path?: string; dateFormat?: string }) => ({
 						path: item.path || "",
 						dateFormat: item.dateFormat || DEFAULT_DAILY_NOTE_FORMAT,
 					}));

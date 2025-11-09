@@ -1,4 +1,4 @@
-import { TFolder, TFile, TAbstractFile, App, Notice } from 'obsidian';
+import { TFolder, TFile, App, Notice } from 'obsidian';
 
 class Data {
 	day: number
@@ -212,7 +212,7 @@ export class Sorter {
 	 * @param dateFormat - date format for parsing (YYYY-MM-DD, DD.MM.YYYY, MM/DD/YYYY)
 	 * @returns sorted array of items
 	 */
-	sortFolder(sortedFolder: TFolder, fileItems: any, ascending: boolean = true, dateFormat: string = "YYYY-MM-DD"): any[] {
+	sortFolder(sortedFolder: TFolder, fileItems: Record<string, unknown>, ascending: boolean = true, dateFormat: string = "YYYY-MM-DD"): unknown[] {
 		const allFileItemsCollection = fileItems;
 
 		// Separate files into matching and non-matching format

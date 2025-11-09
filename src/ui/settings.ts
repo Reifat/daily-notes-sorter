@@ -7,7 +7,6 @@ const INPUT_PLACEHOLDER = "Example: /folder/note";
 const INPUT_DESCRIPTION = "Enter the path to the folder";
 const SETTINGS_TITLE = "Daily notes sorter settings";
 const ADD_BUTTON_TEXT = "Add item";
-const DATE_FORMAT_DESCRIPTION = "Select date format";
 const APPLY_BUTTON_TEXT = "Apply settings";
 
 // Date formats
@@ -301,13 +300,13 @@ export class SorterSettings extends PluginSettingTab {
         setting.addExtraButton((button) => {
             button.setIcon("trash")
                 .setTooltip("Delete")
-                .onClick(async () => {
-                    await this.deleteItem(index);
+                .onClick(() => {
+                    this.deleteItem(index);
                 });
         });
     }
 
-    private async deleteItem(index: number): Promise<void> {
+    private deleteItem(index: number): void {
         this.plugin.settings.items.splice(index, 1);
         this.inputElements.delete(index);
         // Update indices for remaining elements
@@ -330,12 +329,12 @@ export class SorterSettings extends PluginSettingTab {
 
         buttonContainer.createEl("button", {
             text: ADD_BUTTON_TEXT,
-        }).onclick = async () => {
-            await this.addItem();
+        }).onclick = () => {
+            this.addItem();
         };
     }
 
-    private async addItem(): Promise<void> {
+    private addItem(): void {
         // Check if there are empty items before adding a new one
         const hasEmptyItems = this.plugin.settings.items.some(
             (item) => !item.path || item.path.trim() === ""
