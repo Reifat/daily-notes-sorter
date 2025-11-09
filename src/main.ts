@@ -1,6 +1,4 @@
-import { 
-	App,
-	Plugin } from 'obsidian';
+import { Plugin } from 'obsidian';
 
 import { SorterSettings } from './ui/settings';
 import { Sorter } from './core/sorter';

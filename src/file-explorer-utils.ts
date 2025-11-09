@@ -162,12 +162,17 @@ export class FileExplorerUtils {
 	 * Applies patch to FileExplorer for custom sorting
 	 */
 	patchFileExplorerFolder(patchableFileExplorer?: FileExplorerView): boolean {
-		const utils = this;
+		// Capture methods and properties needed in closures
+		const getFolderSettings = (path: string) => this.getFolderSettings(path);
+		const getSortAscending = () => this.sortAscending;
+		const sorter = this.sorter;
+		const checkFileExplorerIsAvailableAndPatchable = (logWarning: boolean) => this.checkFileExplorerIsAvailableAndPatchable(logWarning);
+
 		const requestStandardObsidianSortAfter = (patchUninstaller: MonkeyAroundUninstaller|undefined) => {
 			return () => {
 				if (patchUninstaller) patchUninstaller()
 
-				const fileExplorerView: FileExplorerView | undefined = utils.checkFileExplorerIsAvailableAndPatchable(false)
+				const fileExplorerView: FileExplorerView | undefined = checkFileExplorerIsAvailableAndPatchable(false)
 				if (fileExplorerView) {
 					fileExplorerView.requestSort()
 				}
@@ -181,14 +186,14 @@ export class FileExplorerUtils {
 			if (requireApiVersion && requireApiVersion("1.6.0")) {
 				// Starting from Obsidian 1.6.0 the sorting mechanics has been significantly refactored internally in Obsidian
 				const uninstallerOfFolderSortFunctionWrapper: MonkeyAroundUninstaller = around(patchableFileExplorer.constructor.prototype, {
-					getSortedFolderItems(old: (folder: TFolder) => unknown[]) {
+					getSortedFolderItems: (old: (folder: TFolder) => unknown[]) => {
                         return function (this: FileExplorerView, folder: TFolder): unknown[] {
 							const folderPath = folder.path;
-							const folderSettings = utils.getFolderSettings(folderPath);				
+							const folderSettings = getFolderSettings(folderPath);
 							if (folderSettings) {
-								const ascending = utils.sortAscending;
+								const ascending = getSortAscending();
 								const dateFormat = folderSettings.dateFormat;
-								return utils.sorter.sortFolder(folder, this.fileItems as Record<string, unknown>, ascending, dateFormat);
+								return sorter.sortFolder(folder, this.fileItems, ascending, dateFormat);
 							}
 							else { // default sort
 								return old.call(this, folder);
@@ -203,14 +208,14 @@ export class FileExplorerUtils {
 				const tmpFolder = this.app.vault.getRoot();
 				let Folder = patchableFileExplorer.createFolderDom(tmpFolder).constructor;
 				const uninstallerOfFolderSortFunctionWrapper: MonkeyAroundUninstaller = around(Folder.prototype, {
-					sort(old: (folder: TFolder) => unknown[]) {
+					sort: (old: (folder: TFolder) => unknown[]) => {
 						return function (this: { fileItems: Record<string, unknown> }, folder: TFolder): unknown[] {
 							const folderPath = folder.path;
-							const folderSettings = utils.getFolderSettings(folderPath);						
+							const folderSettings = getFolderSettings(folderPath);						
 							if (folderSettings) {
-								const ascending = utils.sortAscending;
+								const ascending = getSortAscending();
 								const dateFormat = folderSettings.dateFormat;
-								return utils.sorter.sortFolder(folder, this.fileItems, ascending, dateFormat);
+								return sorter.sortFolder(folder, this.fileItems, ascending, dateFormat);
 							}
 							else { // default sort
 								return old.call(this, folder);

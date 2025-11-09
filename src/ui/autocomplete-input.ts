@@ -125,7 +125,7 @@ export class AutocompleteInput {
 
         // Show message if there are more suggestions
         if (suggestions.length > maxSuggestions) {
-            const moreItem = this.suggestionsList.createDiv({
+            this.suggestionsList.createDiv({
                 cls: "suggestion-item_1 suggestion-more",
                 text: `... and ${suggestions.length - maxSuggestions} more`,
             });

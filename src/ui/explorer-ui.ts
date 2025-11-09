@@ -58,14 +58,9 @@ export class ExplorerUI {
 	cleanup(): void {
 		const fileExplorerLeaves = this.app.workspace.getLeavesOfType("file-explorer");
 		if (fileExplorerLeaves.length > 0) {
-			// Save the active leaf to restore focus after reload
-			const activeLeaf = this.app.workspace.activeLeaf;
-			const wasFileExplorerActive = fileExplorerLeaves.some(leaf => leaf === activeLeaf);
-			
 			// Save the view states before detaching
 			const leavesData = fileExplorerLeaves.map(leaf => ({
-				viewState: leaf.getViewState(),
-				wasActive: leaf === activeLeaf
+				viewState: leaf.getViewState()
 			}));
 			
 			// Detach all FileExplorer leaves
@@ -75,32 +70,25 @@ export class ExplorerUI {
 			
 			// Reopen FileExplorer leaves with saved state
 			// Use setTimeout to ensure detach completes before reopening
-			setTimeout(() => {
-				let restoredFileExplorerLeaf: WorkspaceLeaf | null = null;
-				
-				leavesData.forEach((leafData) => {
-					// Try to restore to the same position
-					// For FileExplorer, try to use left leaf (most common case)
-					let targetLeaf = this.app.workspace.getLeftLeaf(false);
-					
-					// If left leaf is not available, create a new leaf
-					if (!targetLeaf) {
-						targetLeaf = this.app.workspace.getLeaf();
+			setTimeout(async () => {
+				// Choose the view state to restore: use the first saved state
+				const preferred = leavesData[0];
+				if (!preferred) return;
+
+				// Prefer the left leaf if available, otherwise create a new one
+				let targetLeaf: WorkspaceLeaf | null = this.app.workspace.getLeftLeaf(false);
+				if (!targetLeaf) {
+					targetLeaf = this.app.workspace.getLeaf();
+				}
+
+				if (targetLeaf) {
+					try {
+						await targetLeaf.setViewState(preferred.viewState);
+						// Always restore focus to the restored File Explorer leaf
+						this.app.workspace.setActiveLeaf(targetLeaf, { focus: true });
+					} catch (err) {
+						console.error("[ExplorerUI] Error setting view state:", err);
 					}
-					
-					if (targetLeaf) {
-						targetLeaf.setViewState(leafData.viewState);
-						
-						// Remember the restored FileExplorer leaf if it was active
-						if (wasFileExplorerActive && leafData.wasActive) {
-							restoredFileExplorerLeaf = targetLeaf;
-						}
-					}
-				});
-				
-				// Restore focus only if FileExplorer was active before detach
-				if (wasFileExplorerActive && restoredFileExplorerLeaf) {
-					this.app.workspace.setActiveLeaf(restoredFileExplorerLeaf, { focus: true });
 				}
 			}, 0);
 		}

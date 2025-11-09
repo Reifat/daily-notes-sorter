@@ -2,6 +2,12 @@ import { App, PluginSettingTab, Setting, TFolder, Notice } from 'obsidian';
 import DailyNotesSorter from '../main';
 import { AutocompleteInput } from './autocomplete-input';
 
+enum SettingsLoadState {
+    Unknown = "Unknown",
+    Loading = "Loading",
+    Loaded = "Loaded",
+}
+
 // Configuration constants
 const INPUT_PLACEHOLDER = "Example: /folder/note";
 const INPUT_DESCRIPTION = "Enter the path to the folder";
@@ -25,10 +31,12 @@ export class SorterSettings extends PluginSettingTab {
     private cachedFolders: string[] | null = null;
     private activeAutocompleteInputs: Set<AutocompleteInput> = new Set();
     private inputElements: Map<number, HTMLInputElement> = new Map();
+    private loadState: SettingsLoadState;
 
     constructor(app: App, plugin: DailyNotesSorter) {
         super(app, plugin);
         this.plugin = plugin;
+        this.loadState = this.plugin.settings ? SettingsLoadState.Loaded : SettingsLoadState.Unknown;
         
         // Update cache and open lists when vault changes
         this.plugin.registerEvent(
@@ -74,9 +82,23 @@ export class SorterSettings extends PluginSettingTab {
         // Reset cache when opening settings
         this.cachedFolders = null;
 
-        // Ensure settings are loaded
-        if (!this.plugin.settings) {
-            this.plugin.loadSettings();
+        // State-driven loading and rendering
+        if (this.loadState !== SettingsLoadState.Loaded || !this.plugin.settings) {
+            if (this.loadState === SettingsLoadState.Unknown) {
+                this.loadState = SettingsLoadState.Loading;
+                this.plugin.loadSettings()
+                    .then(() => {
+                        this.loadState = SettingsLoadState.Loaded;
+                        this.display();
+                    })
+                    .catch((err: Error) => {
+                        console.error("[SorterSettings] Error loading settings:", err);
+                        // Allow retry on next display invocation
+                        this.loadState = SettingsLoadState.Unknown;
+                    });
+            }
+            // Do not render anything until settings are fully loaded
+            return;
         }
 
         this.renderHeader(containerEl);
@@ -87,7 +109,7 @@ export class SorterSettings extends PluginSettingTab {
     }
 
     private renderHeader(container: HTMLElement): void {
-        container.createEl("h2", { text: SETTINGS_TITLE });
+        new Setting(container).setName(SETTINGS_TITLE).setHeading();
     }
 
     private createItemsContainer(container: HTMLElement): HTMLElement {
