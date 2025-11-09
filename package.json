@@ -1,0 +1,27 @@
+{
+	"name": "daily-notes-sorter",
+	"version": "1.0.0",
+	"description": "Obsidian plugin for automatically sorting daily notes by date in the file explorer",
+	"main": "main.js",
+	"scripts": {
+		"dev": "node esbuild.config.mjs",
+		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production"
+	},
+	"keywords": ["obsidian", "obsidian-plugin", "daily-notes", "sorting", "file-explorer"],
+	"author": "Reifat <https://github.com/Reifat>",
+	"license": "MIT",
+	"devDependencies": {
+		"@types/node": "^20.0.0",
+		"@typescript-eslint/eslint-plugin": "^7.0.0",  
+		"@typescript-eslint/parser": "^7.0.0",  
+		"esbuild": "^0.25.12",  
+		"typescript": "^5.3.0",  
+		"monkey-around": "^3.0.0",
+
+		"obsidian": "latest",
+		"tslib": "2.4.0",
+		"moment": "^2.30.1",
+		"moment-timezone": "^0.5.48",
+		"builtin-modules": "3.3.0"
+	}
+}

@@ -1,0 +1,82 @@
+.setting-item-custom-plugin {
+    position: relative; /* Теперь дочерние элементы позиционируются относительно этого контейнера */
+    width: 100%; /* Убедитесь, что контейнер занимает нужную ширину */
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+}
+
+
+.suggestions-list_1 {
+    position: absolute; /* Позиционируется относительно setting-item-custom-plugin */
+    top: 100%; /* Начинается сразу под строкой ввода */
+    left: 0; /* Выравнивание по левому краю родителя */
+    width: 100%; /* Совпадает с шириной строки ввода */
+    background-color: var(--background-primary);
+    border: 1px solid var(--background-modifier-border);
+    max-height: 400px; /* Максимальная высота для предотвращения выхода за пределы экрана */
+    overflow-y: auto; /* Прокрутка появляется только при необходимости */
+    z-index: 1000;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    /* Размер подстраивается под контент автоматически */
+    height: auto;
+    min-height: 0;
+}
+
+
+.suggestion-item_1 {
+    padding: 10px;
+    cursor: pointer;
+    color: var(--text-normal);
+    font-size: 0.9em;
+    border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.suggestion-item_1:hover {
+    background-color: var(--background-modifier-hover);
+}
+
+.suggestion-item_1:last-child {
+    border-bottom: none;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Стили для валидации */
+.input-error {
+    border: 2px solid var(--text-error) !important;
+    background-color: var(--background-modifier-error) !important;
+}
+
+.input-valid {
+    border: 2px solid var(--text-success) !important;
+}
+
+.apply-button-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--background-modifier-border);
+}
+
+.apply-button {
+    padding: 8px 20px;
+    background-color: var(--interactive-accent);
+    color: var(--text-on-accent);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.apply-button:hover {
+    background-color: var(--interactive-accent-hover);
+}
+
+.apply-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

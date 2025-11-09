@@ -1,0 +1,10 @@
+{
+	"id": "daily-notes-sorter",
+	"name": "Daily notes sorter",
+	"version": "1.0.0",
+	"minAppVersion": "0.15.0",
+	"description": "Automatically sort daily notes and files by date in the file explorer. Supports multiple date formats (YYYY-MM-DD, DD.MM.YYYY, DD.MM.YY, MM/DD/YYYY) and flexible folder configuration.",
+	"author": "Nick",
+	"authorUrl": "https://github.com/Reifat",
+	"isDesktopOnly": false
+}
