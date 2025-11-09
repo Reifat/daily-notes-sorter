@@ -129,8 +129,6 @@ export class AutocompleteInput {
                 cls: "suggestion-item_1 suggestion-more",
                 text: `... and ${suggestions.length - maxSuggestions} more`,
             });
-            moreItem.style.fontStyle = "italic";
-            moreItem.style.opacity = "0.7";
         }
 
         // Adjust list size to content after adding elements
@@ -150,7 +148,11 @@ export class AutocompleteInput {
         }
 
         // Reset any fixed heights for automatic calculation
-        this.suggestionsList.style.height = "auto";
+        this.suggestionsList.setCssProps({
+            "--suggestions-list-height": "auto",
+            "--suggestions-list-overflow": "auto"
+        });
+        this.suggestionsList.removeClass("no-scroll");
         
         // Get actual content height
         const contentHeight = this.suggestionsList.scrollHeight;
@@ -164,12 +166,18 @@ export class AutocompleteInput {
         // Set height: either by content or maximum allowed
         if (contentHeight <= maxAllowedHeight && contentHeight > 0) {
             // Content fits, use its actual height
-            this.suggestionsList.style.height = `${contentHeight}px`;
-            this.suggestionsList.style.overflowY = "hidden";
+            this.suggestionsList.setCssProps({
+                "--suggestions-list-height": `${contentHeight}px`,
+                "--suggestions-list-overflow": "hidden"
+            });
+            this.suggestionsList.addClass("no-scroll");
         } else if (contentHeight > 0) {
             // Content doesn't fit, set maximum height with scrolling
-            this.suggestionsList.style.height = `${maxAllowedHeight}px`;
-            this.suggestionsList.style.overflowY = "auto";
+            this.suggestionsList.setCssProps({
+                "--suggestions-list-height": `${maxAllowedHeight}px`,
+                "--suggestions-list-overflow": "auto"
+            });
+            this.suggestionsList.removeClass("no-scroll");
         }
     }
 

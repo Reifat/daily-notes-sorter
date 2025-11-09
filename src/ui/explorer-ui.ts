@@ -1,4 +1,4 @@
-import { App, FileExplorerView } from 'obsidian';
+import { App, FileExplorerView, WorkspaceLeaf } from 'obsidian';
 import { FileExplorerUtils } from '../file-explorer-utils';
 
 export class ExplorerUI {
@@ -36,10 +36,18 @@ export class ExplorerUI {
 			() => this.fileExplorerUtils.sortAscending ? 'ascending' : 'descending'
 		);
 
-		// Style the button
+		// Style the button using CSS class and custom color
 		setTimeout(() => {
 			const button = fileExplorer.headerDom.navButtonsEl?.lastElementChild as HTMLElement;
-			button?.querySelector("svg")?.setAttribute("style", "color: #fff;");
+			if (button) {
+				button.addClass("file-explorer-sort-button");
+				const svg = button.querySelector("svg") as unknown as HTMLElement;
+				if (svg && typeof svg.setCssProps === 'function') {
+					svg.setCssProps({
+						"--sort-button-icon-color": "#fff"
+					});
+				}
+			}
 		}, 100);
 	}
 
@@ -68,7 +76,7 @@ export class ExplorerUI {
 			// Reopen FileExplorer leaves with saved state
 			// Use setTimeout to ensure detach completes before reopening
 			setTimeout(() => {
-				let restoredFileExplorerLeaf: any = null;
+				let restoredFileExplorerLeaf: WorkspaceLeaf | null = null;
 				
 				leavesData.forEach((leafData) => {
 					// Try to restore to the same position

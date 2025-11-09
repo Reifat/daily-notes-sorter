@@ -14,12 +14,12 @@
     background-color: var(--background-primary);
     border: 1px solid var(--background-modifier-border);
     max-height: 400px; /* Maximum height to prevent overflow beyond the screen */
-    overflow-y: auto; /* Scrollbar appears only when needed */
     z-index: 1000;
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
     border-radius: 5px;
     /* Size adjusts to content automatically */
-    height: auto;
+    height: var(--suggestions-list-height, auto);
+    overflow-y: var(--suggestions-list-overflow, auto);
     min-height: 0;
 }
 
@@ -38,6 +38,15 @@
 
 .suggestion-item_1:last-child {
     border-bottom: none;
+}
+
+.suggestion-more {
+    font-style: italic;
+    opacity: 0.7;
+}
+
+.suggestions-list_1.no-scroll {
+    overflow-y: hidden;
 }
 
 .hidden {
@@ -79,4 +88,9 @@
 .apply-button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+/* File Explorer sort button styles */
+.file-explorer-sort-button svg {
+    color: var(--sort-button-icon-color, #fff);
 }
