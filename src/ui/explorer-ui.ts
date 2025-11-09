@@ -70,7 +70,7 @@ export class ExplorerUI {
 			
 			// Reopen FileExplorer leaves with saved state
 			// Use setTimeout to ensure detach completes before reopening
-			setTimeout(async () => {
+			setTimeout(() => {
 				// Choose the view state to restore: use the first saved state
 				const preferred = leavesData[0];
 				if (!preferred) return;
@@ -82,13 +82,14 @@ export class ExplorerUI {
 				}
 
 				if (targetLeaf) {
-					try {
-						await targetLeaf.setViewState(preferred.viewState);
-						// Always restore focus to the restored File Explorer leaf
-						this.app.workspace.setActiveLeaf(targetLeaf, { focus: true });
-					} catch (err) {
-						console.error("[ExplorerUI] Error setting view state:", err);
-					}
+					targetLeaf.setViewState(preferred.viewState)
+						.then(() => {
+							// Always restore focus to the restored File Explorer leaf
+							this.app.workspace.setActiveLeaf(targetLeaf as WorkspaceLeaf, { focus: true });
+						})
+						.catch((err) => {
+							console.error("[ExplorerUI] Error setting view state:", err);
+						});
 				}
 			}, 0);
 		}
