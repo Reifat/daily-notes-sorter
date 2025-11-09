@@ -5,9 +5,16 @@
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
-		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production"
+		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+		"release": "npm run build && node scripts/release.js"
 	},
-	"keywords": ["obsidian", "obsidian-plugin", "daily-notes", "sorting", "file-explorer"],
+	"keywords": [
+		"obsidian",
+		"obsidian-plugin",
+		"daily-notes",
+		"sorting",
+		"file-explorer"
+	],
 	"author": "Reifat <https://github.com/Reifat>",
 	"license": "MIT",
 	"dependencies": {
@@ -17,6 +24,7 @@
 		"@types/node": "^20.0.0",
 		"@typescript-eslint/eslint-plugin": "^8.0.0",
 		"@typescript-eslint/parser": "^8.0.0",
+		"archiver": "^7.0.1",
 		"builtin-modules": "3.3.0",
 		"esbuild": "^0.25.12",
 		"eslint": "^9.0.0",
