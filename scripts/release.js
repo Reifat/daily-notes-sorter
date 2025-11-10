@@ -1,6 +1,6 @@
-const fs = require("fs");
-const path = require("path");
-const archiver = require("archiver");
+import fs from "node:fs";
+import path from "node:path";
+import archiver from "archiver";
 
 function ensureDir(p) {
 	if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true });
