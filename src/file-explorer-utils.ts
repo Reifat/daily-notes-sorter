@@ -1,7 +1,9 @@
-import { App, Plugin, requireApiVersion, FileExplorerView, TFolder } from 'obsidian';
 import { around } from 'monkey-around';
-import { Sorter } from './core/sorter';
-import { FolderItem } from './main';
+import { requireApiVersion } from 'obsidian';
+
+import type { Sorter } from './core/sorter';
+import type { FolderItem } from './main';
+import type { App, Plugin, FileExplorerView, TFolder } from 'obsidian';
 
 // the monkey-around package doesn't export the below type
 type MonkeyAroundUninstaller = () => void;
@@ -60,13 +62,11 @@ export class FileExplorerUtils {
 		this.sortAscending = ascending;
 		
 		// Update plugin settings
-		if (this.settings) {
-			this.settings.sortAscending = ascending;
-		}
+		this.settings.sortAscending = ascending;
 		
 		// Save settings if required
 		if (saveSettings && this.pluginInstance) {
-			this.pluginInstance.saveSettings().catch((err: Error) => {
+			this.pluginInstance.saveSettings().catch((err: unknown) => {
 				console.error("[FileExplorerUtils] Error saving sort direction:", err);
 			});
 		}
@@ -96,7 +96,7 @@ export class FileExplorerUtils {
 	 * Gets FileExplorerView instance from workspace
 	 */
 	getFileExplorer(): FileExplorerView | undefined {
-		let fileExplorer: FileExplorerView | undefined = this.app.workspace.getLeavesOfType("file-explorer")?.first()
+		const fileExplorer: FileExplorerView | undefined = this.app.workspace.getLeavesOfType("file-explorer").first()
 			?.view as unknown as FileExplorerView;
 		return fileExplorer;
 	}
@@ -115,7 +115,7 @@ export class FileExplorerUtils {
 		return new Promise((resolve, reject) => {
 			const startTime = Date.now();
 
-			const checkFileExplorer = () => {
+			const checkFileExplorer = (): void => {
 				const fileExplorer = this.getFileExplorer();
 				if (fileExplorer) {
 					clearInterval(timer);
@@ -134,10 +134,10 @@ export class FileExplorerUtils {
 	 * Checks availability and patchability of FileExplorer
 	 */
 	checkFileExplorerIsAvailableAndPatchable(logWarning: boolean = true): FileExplorerView | undefined {
-		let fileExplorerView: FileExplorerView | undefined = this.getFileExplorer()
+		const fileExplorerView: FileExplorerView | undefined = this.getFileExplorer()
 		if (fileExplorerView && typeof fileExplorerView.requestSort === 'function') {
 			// The plugin integration points changed with Obsidian 1.6.0 hence the patchability-check should also be Obsidian version aware
-			if (requireApiVersion && requireApiVersion("1.6.0")) {
+			if (requireApiVersion("1.6.0")) {
 				if (typeof fileExplorerView.getSortedFolderItems === 'function') {
 					return fileExplorerView
 				}
@@ -163,14 +163,15 @@ export class FileExplorerUtils {
 	 */
 	patchFileExplorerFolder(patchableFileExplorer?: FileExplorerView): boolean {
 		// Capture methods and properties needed in closures
-		const getFolderSettings = (path: string) => this.getFolderSettings(path);
-		const getSortAscending = () => this.sortAscending;
+		const getFolderSettings = (path: string): FolderItem | undefined => this.getFolderSettings(path);
+		const getSortAscending = (): boolean => this.sortAscending;
 		const sorter = this.sorter;
-		const checkFileExplorerIsAvailableAndPatchable = (logWarning: boolean) => this.checkFileExplorerIsAvailableAndPatchable(logWarning);
+		const checkFileExplorerIsAvailableAndPatchable = (logWarning: boolean): FileExplorerView | undefined =>
+			this.checkFileExplorerIsAvailableAndPatchable(logWarning);
 
-		const requestStandardObsidianSortAfter = (patchUninstaller: MonkeyAroundUninstaller|undefined) => {
-			return () => {
-				if (patchUninstaller) patchUninstaller()
+		const requestStandardObsidianSortAfter = (patchUninstaller: MonkeyAroundUninstaller|undefined): (() => void) => {
+			return (): void => {
+				if (patchUninstaller) {patchUninstaller()}
 
 				const fileExplorerView: FileExplorerView | undefined = checkFileExplorerIsAvailableAndPatchable(false)
 				if (fileExplorerView) {
@@ -183,7 +184,7 @@ export class FileExplorerUtils {
 		// That's why not showing and not logging error message here
 		patchableFileExplorer = patchableFileExplorer ?? this.checkFileExplorerIsAvailableAndPatchable(false)
 		if (patchableFileExplorer) {
-			if (requireApiVersion && requireApiVersion("1.6.0")) {
+			if (requireApiVersion("1.6.0")) {
 				// Starting from Obsidian 1.6.0 the sorting mechanics has been significantly refactored internally in Obsidian
 				const uninstallerOfFolderSortFunctionWrapper: MonkeyAroundUninstaller = around(patchableFileExplorer.constructor.prototype, {
 					getSortedFolderItems: (old: (folder: TFolder) => unknown[]) => {
@@ -206,7 +207,7 @@ export class FileExplorerUtils {
 			} else {
 				// Up to Obsidian 1.6.0
 				const tmpFolder = this.app.vault.getRoot();
-				let Folder = patchableFileExplorer.createFolderDom(tmpFolder).constructor;
+				const Folder = patchableFileExplorer.createFolderDom(tmpFolder).constructor;
 				const uninstallerOfFolderSortFunctionWrapper: MonkeyAroundUninstaller = around(Folder.prototype, {
 					sort: (old: (folder: TFolder) => unknown[]) => {
 						return function (this: { fileItems: Record<string, unknown> }, folder: TFolder): unknown[] {

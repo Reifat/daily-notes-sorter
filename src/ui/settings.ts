@@ -1,6 +1,9 @@
-import { App, PluginSettingTab, Setting, TFolder, Notice } from 'obsidian';
-import DailyNotesSorter from '../main';
+import { PluginSettingTab, Setting, TFolder, Notice } from 'obsidian';
+
 import { AutocompleteInput } from './autocomplete-input';
+
+import type DailyNotesSorter from '../main';
+import type { App} from 'obsidian';
 
 enum SettingsLoadState {
     Unknown = "Unknown",
@@ -36,7 +39,7 @@ export class SorterSettings extends PluginSettingTab {
     constructor(app: App, plugin: DailyNotesSorter) {
         super(app, plugin);
         this.plugin = plugin;
-        this.loadState = this.plugin.settings ? SettingsLoadState.Loaded : SettingsLoadState.Unknown;
+		this.loadState = SettingsLoadState.Unknown;
         
         // Update cache and open lists when vault changes
         this.plugin.registerEvent(
@@ -83,7 +86,7 @@ export class SorterSettings extends PluginSettingTab {
         this.cachedFolders = null;
 
         // State-driven loading and rendering
-        if (this.loadState !== SettingsLoadState.Loaded || !this.plugin.settings) {
+		if (this.loadState !== SettingsLoadState.Loaded) {
             if (this.loadState === SettingsLoadState.Unknown) {
                 this.loadState = SettingsLoadState.Loading;
                 this.plugin.loadSettings()
@@ -91,7 +94,7 @@ export class SorterSettings extends PluginSettingTab {
                         this.loadState = SettingsLoadState.Loaded;
                         this.display();
                     })
-                    .catch((err: Error) => {
+					.catch((err: unknown) => {
                         console.error("[SorterSettings] Error loading settings:", err);
                         // Allow retry on next display invocation
                         this.loadState = SettingsLoadState.Unknown;
@@ -117,7 +120,7 @@ export class SorterSettings extends PluginSettingTab {
     }
 
     private renderItems(): void {
-        if (!this.itemsContainer) return;
+        if (!this.itemsContainer) {return;}
 
         this.itemsContainer.empty();
 
@@ -132,7 +135,7 @@ export class SorterSettings extends PluginSettingTab {
     }
 
     private renderEmptyState(): void {
-        if (!this.itemsContainer) return;
+        if (!this.itemsContainer) {return;}
 
         this.itemsContainer.createDiv({
             cls: "setting-item-description",
@@ -141,7 +144,7 @@ export class SorterSettings extends PluginSettingTab {
     }
 
     private renderItem(item: { path: string; dateFormat?: string }, index: number): void {
-        if (!this.itemsContainer) return;
+        if (!this.itemsContainer) {return;}
 
         const itemDiv = this.itemsContainer.createDiv({
             cls: "setting-item-custom-plugin",
@@ -224,10 +227,7 @@ export class SorterSettings extends PluginSettingTab {
      * Validates a single item by index
      */
     private validateItem(index: number): boolean {
-        const item = this.plugin.settings.items[index];
-        if (!item) return false;
-
-        const isValid = this.validatePath(item.path);
+		const isValid = this.validatePath(this.plugin.settings.items[index].path);
         const inputEl = this.inputElements.get(index);
 
         if (inputEl) {

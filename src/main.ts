@@ -1,9 +1,9 @@
 import { Plugin } from 'obsidian';
 
-import { SorterSettings } from './ui/settings';
 import { Sorter } from './core/sorter';
 import { FileExplorerUtils } from './file-explorer-utils';
 import { ExplorerUI } from './ui/explorer-ui';
+import { SorterSettings } from './ui/settings';
 
 
 const DEFAULT_DAILY_NOTE_FORMAT = "YYYY-MM-DD";
@@ -29,7 +29,7 @@ export default class DailyNotesSorter extends Plugin {
 	private fileExplorerUtils!: FileExplorerUtils;
 	private explorerUI!: ExplorerUI;
 
-	async onload() {
+	async onload(): Promise<void> {
 		
 		await this.loadSettings();
 
@@ -52,7 +52,7 @@ export default class DailyNotesSorter extends Plugin {
 				this.fileExplorerUtils.applySort();
 			}, 100);
 		})
-		.catch((err: Error) => {
+		.catch((err: unknown) => {
 			console.error("[DailyNotesSorter] Error initializing FileExplorer:", err);
 			// Note: We don't show a Notice here as the plugin might still work
 			// if FileExplorer loads later
@@ -63,36 +63,39 @@ export default class DailyNotesSorter extends Plugin {
 	}
 
 
-	onunload() {
+	onunload(): void {
 		// Cleanup is handled automatically by Obsidian:
 		// - Patches registered via this.plugin.register() are automatically uninstalled
 		// - Setting tabs are automatically removed
 		// - Event listeners registered via this.registerEvent() are automatically removed
 		
 		// Cleanup UI components (e.g., remove sort button from FileExplorer)
-		if (this.explorerUI) {
-			this.explorerUI.cleanup();
-		}
+		this.explorerUI.cleanup();
 	}
 
-	async loadSettings() {
+	async loadSettings(): Promise<void> {
 		try {
-			const loadedData = await this.loadData();
+			const loadedData: unknown = await this.loadData();
 			
 			// Initialize settings with default values
 			this.settings = Object.assign({}, DEFAULT_SETTINGS);
 			
 			// If there is loaded data, apply it
-			if (loadedData) {
-				if (loadedData.items && Array.isArray(loadedData.items)) {
-					this.settings.items = loadedData.items.map((item: { path?: string; dateFormat?: string }) => ({
+			if (loadedData && typeof loadedData === 'object') {
+				const data = loadedData as {
+					items?: Array<{ path?: string; dateFormat?: string }>;
+					sortAscending?: boolean;
+				};
+
+				if (Array.isArray(data.items)) {
+					this.settings.items = data.items.map((item) => ({
 						path: item.path || "",
 						dateFormat: item.dateFormat || DEFAULT_DAILY_NOTE_FORMAT,
 					}));
 				}
 				// Load saved sort state
-				if (typeof loadedData.sortAscending === 'boolean') {
-					this.settings.sortAscending = loadedData.sortAscending;
+				if (typeof data.sortAscending === 'boolean') {
+					this.settings.sortAscending = data.sortAscending;
 				}
 			}
 		} catch (error) {
@@ -102,36 +105,24 @@ export default class DailyNotesSorter extends Plugin {
 		}
 	}
 
-	async saveSettings() {
+	async saveSettings(): Promise<void> {
 		try {
 			// Ensure data structure is correct before saving
-			if (!this.settings) {
-				this.settings = { items: [], sortAscending: true };
-			}
-			
 			// Validate and normalize data before saving
-			if (this.settings.items) {
-				this.settings.items = this.settings.items.map((item) => ({
-					path: item.path || "",
-					dateFormat: item.dateFormat || DEFAULT_DAILY_NOTE_FORMAT,
-				}));
-			} else {
-				this.settings.items = [];
-			}
+			this.settings.items = this.settings.items.map((item) => ({
+				path: item.path || "",
+				dateFormat: item.dateFormat || DEFAULT_DAILY_NOTE_FORMAT,
+			}));
 			
 			// Save sort state from FileExplorerUtils
-			if (this.fileExplorerUtils) {
-				this.settings.sortAscending = this.fileExplorerUtils.sortAscending;
-			}
+			this.settings.sortAscending = this.fileExplorerUtils.sortAscending;
 			
 			await this.saveData(this.settings);
 			
 			// Update settings in FileExplorerUtils after saving
-			if (this.fileExplorerUtils) {
-				this.fileExplorerUtils.updateSettings(this.settings);
-				// Apply sorting after updating settings
-				this.fileExplorerUtils.applySort();
-			}
+			this.fileExplorerUtils.updateSettings(this.settings);
+			// Apply sorting after updating settings
+			this.fileExplorerUtils.applySort();
 		} catch (error) {
 			console.error("Error saving settings:", error);
 		}

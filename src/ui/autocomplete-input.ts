@@ -49,9 +49,9 @@ export class AutocompleteInput {
     }
 
     private attachEventListeners(): void {
-        this.inputEl.addEventListener("input", () => this.handleInput());
-        this.inputEl.addEventListener("focus", () => this.handleFocus());
-        this.inputEl.addEventListener("blur", () => this.handleBlur());
+        this.inputEl.addEventListener("input", () => { this.handleInput(); });
+        this.inputEl.addEventListener("focus", () => { this.handleFocus(); });
+        this.inputEl.addEventListener("blur", () => { this.handleBlur(); });
         
         // Recalculate height on window resize
         window.addEventListener("resize", () => {
@@ -92,7 +92,7 @@ export class AutocompleteInput {
 
     private handleBlur(): void {
         // Delay for handling click on suggestion
-        setTimeout(() => this.hideSuggestions(), 100);
+        setTimeout(() => { this.hideSuggestions(); }, 100);
     }
 
     private filterSuggestions(query: string): string[] {
@@ -185,7 +185,7 @@ export class AutocompleteInput {
         // Check if element with such text already exists in list
         const existingItems = Array.from(this.suggestionsList.children);
         const alreadyExists = existingItems.some((child) => {
-            return child.textContent?.trim() === suggestion;
+			return child.textContent.trim() === suggestion;
         });
 
         if (alreadyExists) {

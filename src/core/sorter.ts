@@ -1,4 +1,6 @@
-import { TFolder, TFile, App, Notice } from 'obsidian';
+import { TFile, Notice } from 'obsidian';
+
+import type { TFolder, App} from 'obsidian';
 
 class Data {
 	day: number
@@ -97,9 +99,9 @@ export class Sorter {
 
 		order.forEach((part, idx) => {
 			const val = idx === 0 ? g1 : idx === 1 ? g2 : g3;
-			if (part === 'd') dayStr = val;
-			if (part === 'm') monthStr = val;
-			if (part === 'y') yearStr = val;
+			if (part === 'd') {dayStr = val;}
+			if (part === 'm') {monthStr = val;}
+			if (part === 'y') {yearStr = val;}
 		});
 
 		// Convert textual month to number

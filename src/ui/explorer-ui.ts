@@ -1,5 +1,6 @@
-import { App, FileExplorerView, WorkspaceLeaf } from 'obsidian';
-import { FileExplorerUtils } from '../file-explorer-utils';
+import type { FileExplorerUtils } from '../file-explorer-utils';
+import type { App, FileExplorerView, WorkspaceLeaf } from 'obsidian';
+
 
 export class ExplorerUI {
 	private app: App;
@@ -16,7 +17,7 @@ export class ExplorerUI {
 	}
 
 	initialize(fileExplorer: FileExplorerView): void {
-		if (!fileExplorer?.headerDom.navButtonsEl) {
+		if (!fileExplorer.headerDom.navButtonsEl) {
 			return;
 		}
 
@@ -38,10 +39,10 @@ export class ExplorerUI {
 
 		// Style the button using CSS class and custom color
 		setTimeout(() => {
-			const button = fileExplorer.headerDom.navButtonsEl?.lastElementChild as HTMLElement;
+			const button = fileExplorer.headerDom.navButtonsEl?.lastElementChild as HTMLElement | null;
 			if (button) {
 				button.addClass("file-explorer-sort-button");
-				const svg = button.querySelector("svg") as unknown as HTMLElement;
+				const svg = button.querySelector("svg") as { setCssProps?: (props: Record<string, string>) => void } | null;
 				if (svg && typeof svg.setCssProps === 'function') {
 					svg.setCssProps({
 						"--sort-button-icon-color": "#fff"
@@ -73,24 +74,18 @@ export class ExplorerUI {
 			setTimeout(() => {
 				// Choose the view state to restore: use the first saved state
 				const preferred = leavesData[0];
-				if (!preferred) return;
 
 				// Prefer the left leaf if available, otherwise create a new one
-				let targetLeaf: WorkspaceLeaf | null = this.app.workspace.getLeftLeaf(false);
-				if (!targetLeaf) {
-					targetLeaf = this.app.workspace.getLeaf();
-				}
+				const targetLeaf: WorkspaceLeaf = this.app.workspace.getLeftLeaf(false) ?? this.app.workspace.getLeaf();
 
-				if (targetLeaf) {
-					targetLeaf.setViewState(preferred.viewState)
-						.then(() => {
-							// Always restore focus to the restored File Explorer leaf
-								this.app.workspace.setActiveLeaf(targetLeaf, { focus: true });
-						})
-						.catch((err) => {
-							console.error("[ExplorerUI] Error setting view state:", err);
-						});
-				}
+				targetLeaf.setViewState(preferred.viewState)
+					.then(() => {
+						// Always restore focus to the restored File Explorer leaf
+							this.app.workspace.setActiveLeaf(targetLeaf, { focus: true });
+					})
+					.catch((err: unknown) => {
+						console.error("[ExplorerUI] Error setting view state:", err);
+					});
 			}, 0);
 		}
 	}
