@@ -1,39 +1,44 @@
 {
-	"name": "daily-notes-sorter",
-	"version": "1.0.0",
-	"description": "Obsidian plugin for automatically sorting daily notes by date in the file explorer",
-	"main": "main.js",
-	"scripts": {
-		"dev": "node esbuild.config.mjs",
-		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
-		"lint": "eslint . --max-warnings=0",
-		"lint:fix": "eslint . --fix",
-		"release": "npm run lint && npm run build && node scripts/release.js"
-	},
-	"keywords": [
-		"obsidian",
-		"obsidian-plugin",
-		"daily-notes",
-		"sorting",
-		"file-explorer"
-	],
-	"author": "Reifat <https://github.com/Reifat>",
-	"license": "MIT",
-	"type": "module",
-	"dependencies": {
-		"monkey-around": "^3.0.0"
-	},
-	"devDependencies": {
-		"@eslint/js": "^9.39.1",
-		"@types/node": "^20.0.0",
-		"archiver": "^7.0.1",
-		"builtin-modules": "3.3.0",
-		"esbuild": "^0.25.12",
-		"eslint": "^9.39.1",
-		"eslint-plugin-import": "^2.32.0",
-		"eslint-plugin-obsidianmd": "^0.1.8",
-		"obsidian": "latest",
-		"typescript": "^5.3.0",
-		"typescript-eslint": "^8.46.3"
-	}
+  "name": "daily-notes-sorter",
+  "version": "1.0.0",
+  "description": "Obsidian plugin for automatically sorting daily notes by date in the file explorer",
+  "main": "main.js",
+  "scripts": {
+    "dev": "node esbuild.config.mjs",
+    "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+    "lint": "eslint . --max-warnings=0",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "release": "npm run format && npm run lint && npm run build && node scripts/release.js"
+  },
+  "keywords": [
+    "obsidian",
+    "obsidian-plugin",
+    "daily-notes",
+    "sorting",
+    "file-explorer"
+  ],
+  "author": "Reifat <https://github.com/Reifat>",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "monkey-around": "^3.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/node": "^20.0.0",
+    "archiver": "^7.0.1",
+    "builtin-modules": "3.3.0",
+    "esbuild": "^0.25.12",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-obsidianmd": "^0.1.8",
+    "eslint-plugin-unicorn": "^62.0.0",
+    "obsidian": "latest",
+    "prettier": "^3.6.2",
+    "typescript": "^5.3.0",
+    "typescript-eslint": "^8.46.3"
+  }
 }

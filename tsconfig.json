@@ -11,12 +11,12 @@
     "importHelpers": true,
     "isolatedModules": true,
     "strictNullChecks": true,
-    "strict": true, 
-    "esModuleInterop": true,  
-    "skipLibCheck": true,  
-    "forceConsistentCasingInFileNames": true,  
-    "resolveJsonModule": true,  
-    "lib": ["ES2020", "DOM"]  
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "lib": ["ES2020", "DOM"]
   },
   "include": ["**/*.ts"],
   "exclude": ["node_modules", "main.js", "backup"]

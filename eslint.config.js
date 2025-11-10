@@ -149,98 +149,162 @@ RULE CATALOG (what and why) — with tiny examples
       import z from "z";
       // blank line between builtin/external/internal, etc.
 */
-import js from "@eslint/js";
-import tseslint from "typescript-eslint";
-import obsidianmd from "eslint-plugin-obsidianmd";
-import importPlugin from "eslint-plugin-import";
+import js from '@eslint/js';
+import tseslint from 'typescript-eslint';
+import obsidianmd from 'eslint-plugin-obsidianmd';
+import importPlugin from 'eslint-plugin-import';
+import unicorn from 'eslint-plugin-unicorn';
+import eslintConfigPrettier from 'eslint-config-prettier';
 
 // Scope type-checked rules to src/**/*.ts(x)
 const tsTypeChecked = tseslint.configs.recommendedTypeChecked.map((cfg) => ({
-	...cfg,
-	files: ["src/**/*.ts", "src/**/*.tsx"],
+  ...cfg,
+  files: ['src/**/*.ts', 'src/**/*.tsx'],
 }));
 const tsStrictTypeChecked = tseslint.configs.strictTypeChecked.map((cfg) => ({
-	...cfg,
-	files: ["src/**/*.ts", "src/**/*.tsx"],
+  ...cfg,
+  files: ['src/**/*.ts', 'src/**/*.tsx'],
 }));
 
 export default [
-	// Ignore build artifacts and non-source configs
-	{ ignores: ["node_modules/**", "release/**", "main.js", "eslint.config.js", "scripts/**"] },
+  // Ignore build artifacts and non-source configs
+  { ignores: ['node_modules/**', 'release/**', 'main.js', 'eslint.config.js', 'scripts/**'] },
 
-	// Base JS rules
-	js.configs.recommended,
+  // Base JS rules
+  js.configs.recommended,
 
-	// Base TS rules (untyped) — syntax-level safety
-	...tseslint.configs.recommended,
+  // Base TS rules (untyped) — syntax-level safety
+  ...tseslint.configs.recommended,
 
-	// Enable typed linting for src TS files (required by many rules below)
-	{
-		files: ["src/**/*.ts", "src/**/*.tsx"],
-		languageOptions: {
-			parserOptions: {
-				project: "./tsconfig.json",
-				tsconfigRootDir: process.cwd(),
-			},
-		},
-	},
+  // Enable typed linting for src TS files (required by many rules below)
+  {
+    files: ['src/**/*.ts', 'src/**/*.tsx'],
+    languageOptions: {
+      parserOptions: {
+        project: './tsconfig.json',
+        tsconfigRootDir: process.cwd(),
+      },
+    },
+  },
 
-	// TS recommendedTypeChecked scoped to src
-	...tsTypeChecked,
-	// TS strictTypeChecked scoped to src
-	...tsStrictTypeChecked,
+  // TS recommendedTypeChecked scoped to src
+  ...tsTypeChecked,
+  // TS strictTypeChecked scoped to src
+  ...tsStrictTypeChecked,
 
-	// Obsidian rules for src TS
-	{
-		files: ["src/**/*.ts", "src/**/*.tsx"],
-		plugins: { obsidianmd, import: importPlugin },
-		rules: {
-			"obsidianmd/sample-names": "off",
-			"obsidianmd/prefer-file-manager-trash-file": "error",
-			"obsidianmd/commands/no-command-in-command-id": "error",
-			"obsidianmd/commands/no-command-in-command-name": "error",
-			"obsidianmd/commands/no-default-hotkeys": "error",
-			"obsidianmd/commands/no-plugin-id-in-command-id": "error",
-			"obsidianmd/commands/no-plugin-name-in-command-name": "error",
-			"obsidianmd/settings-tab/no-manual-html-headings": "error",
-			"obsidianmd/settings-tab/no-problematic-settings-headings": "error",
-			"obsidianmd/vault/iterate": "error",
-			"obsidianmd/detach-leaves": "error",
-			"obsidianmd/hardcoded-config-path": "error",
-			"obsidianmd/no-forbidden-elements": "error",
-			"obsidianmd/no-plugin-as-component": "error",
-			"obsidianmd/no-sample-code": "error",
-			"obsidianmd/no-tfile-tfolder-cast": "error",
-			"obsidianmd/no-view-references-in-plugin": "error",
-			"obsidianmd/no-static-styles-assignment": "error",
-			"obsidianmd/object-assign": "error",
-			"obsidianmd/platform": "error",
-			"obsidianmd/regex-lookbehind": "error",
-			"obsidianmd/validate-manifest": "error",
-			"obsidianmd/validate-license": "error",
-			"obsidianmd/ui/sentence-case": ["error", { enforceCamelCaseLower: true }],
+  // Obsidian rules for src TS
+  {
+    files: ['src/**/*.ts', 'src/**/*.tsx'],
+    plugins: { obsidianmd, import: importPlugin },
+    rules: {
+      'obsidianmd/sample-names': 'off',
+      'obsidianmd/prefer-file-manager-trash-file': 'error',
+      'obsidianmd/commands/no-command-in-command-id': 'error',
+      'obsidianmd/commands/no-command-in-command-name': 'error',
+      'obsidianmd/commands/no-default-hotkeys': 'error',
+      'obsidianmd/commands/no-plugin-id-in-command-id': 'error',
+      'obsidianmd/commands/no-plugin-name-in-command-name': 'error',
+      'obsidianmd/settings-tab/no-manual-html-headings': 'error',
+      'obsidianmd/settings-tab/no-problematic-settings-headings': 'error',
+      'obsidianmd/vault/iterate': 'error',
+      'obsidianmd/detach-leaves': 'error',
+      'obsidianmd/hardcoded-config-path': 'error',
+      'obsidianmd/no-forbidden-elements': 'error',
+      'obsidianmd/no-plugin-as-component': 'error',
+      'obsidianmd/no-sample-code': 'error',
+      'obsidianmd/no-tfile-tfolder-cast': 'error',
+      'obsidianmd/no-view-references-in-plugin': 'error',
+      'obsidianmd/no-static-styles-assignment': 'error',
+      'obsidianmd/object-assign': 'error',
+      'obsidianmd/platform': 'error',
+      'obsidianmd/regex-lookbehind': 'error',
+      'obsidianmd/validate-manifest': 'error',
+      'obsidianmd/validate-license': 'error',
+      'obsidianmd/ui/sentence-case': ['error', { enforceCamelCaseLower: true }],
 
-			"@typescript-eslint/no-floating-promises": "error",
-			"@typescript-eslint/no-misused-promises": ["error", { checksVoidReturn: false }],
-			"@typescript-eslint/promise-function-async": "error",
-			"@typescript-eslint/consistent-type-imports": ["error", { prefer: "type-imports", fixStyle: "separate-type-imports" }],
-			"@typescript-eslint/explicit-function-return-type": ["error", { allowExpressions: true }],
-			"@typescript-eslint/no-unsafe-assignment": "error",
-			"@typescript-eslint/no-unsafe-member-access": "error",
-			"@typescript-eslint/no-unsafe-call": "error",
-			"@typescript-eslint/no-unsafe-return": "error",
-			"@typescript-eslint/no-unsafe-argument": "error",
-			"@typescript-eslint/restrict-template-expressions": ["error", { allowNumber: true, allowBoolean: false, allowNullish: false }],
+      '@typescript-eslint/no-floating-promises': 'error',
+      '@typescript-eslint/no-misused-promises': ['error', { checksVoidReturn: false }],
+      '@typescript-eslint/promise-function-async': 'error',
+      '@typescript-eslint/consistent-type-imports': [
+        'error',
+        { prefer: 'type-imports', fixStyle: 'separate-type-imports' },
+      ],
+      '@typescript-eslint/explicit-function-return-type': ['error', { allowExpressions: true }],
+      '@typescript-eslint/no-unsafe-assignment': 'error',
+      '@typescript-eslint/no-unsafe-member-access': 'error',
+      '@typescript-eslint/no-unsafe-call': 'error',
+      '@typescript-eslint/no-unsafe-return': 'error',
+      '@typescript-eslint/no-unsafe-argument': 'error',
+      '@typescript-eslint/restrict-template-expressions': [
+        'error',
+        { allowNumber: true, allowBoolean: false, allowNullish: false },
+      ],
 
-			"eqeqeq": ["error", "smart"],
-			"curly": ["error", "all"],
-			"no-console": ["error", { allow: ["warn", "error", "debug"] }],
+      // Naming convention (popular TS setup)
+      '@typescript-eslint/naming-convention': [
+        'error',
+        // Variables (includes imports): allow PascalCase for constructors/components, UPPER_CASE for consts
+        { selector: 'variable', format: ['camelCase', 'UPPER_CASE', 'PascalCase'] },
+        // Parameters: allow leading underscore
+        { selector: 'parameter', format: ['camelCase'], leadingUnderscore: 'allow' },
+        // Class members: default camelCase
+        { selector: 'memberLike', format: ['camelCase'], leadingUnderscore: 'allow' },
+        // Static readonly members (constants) can be UPPER_CASE
+        {
+          selector: 'memberLike',
+          modifiers: ['static', 'readonly'],
+          format: ['UPPER_CASE', 'camelCase'],
+          leadingUnderscore: 'allow',
+        },
+        // Types, classes, interfaces, enums, type aliases: PascalCase
+        { selector: 'typeLike', format: ['PascalCase'] },
+        // Enum members: PascalCase (common TS convention)
+        { selector: 'enumMember', format: ['PascalCase'] },
+        // Type parameters: PascalCase with T-prefix
+        { selector: 'typeParameter', format: ['PascalCase'], prefix: ['T'] },
+        // Interfaces should not be prefixed with I
+        {
+          selector: 'interface',
+          format: ['PascalCase'],
+          custom: { regex: '^I[A-Z]', match: false },
+        },
+        // Quoted properties are ignored
+        { selector: 'property', modifiers: ['requiresQuotes'], format: null },
+      ],
 
-			"import/order": ["error", {
-				"groups": ["builtin", "external", "internal", "parent", "sibling", "index", "object", "type"],
-				"newlines-between": "always",
-				"alphabetize": { order: "asc", caseInsensitive: true }
-			}]
-		}
-	}
+      eqeqeq: ['error', 'smart'],
+      curly: ['error', 'all'],
+      'no-console': ['error', { allow: ['warn', 'error', 'debug'] }],
+
+      'import/order': [
+        'error',
+        {
+          groups: [
+            'builtin',
+            'external',
+            'internal',
+            'parent',
+            'sibling',
+            'index',
+            'object',
+            'type',
+          ],
+          'newlines-between': 'always',
+          alphabetize: { order: 'asc', caseInsensitive: true },
+        },
+      ],
+    },
+  },
+
+  // Enforce file naming convention (kebab-case) for source files
+  {
+    files: ['src/**/*.{ts,tsx,js,jsx}'],
+    plugins: { unicorn },
+    rules: {
+      'unicorn/filename-case': ['error', { cases: { kebabCase: true } }],
+    },
+  },
+
+  // Disable stylistic rules that conflict with Prettier
+  eslintConfigPrettier,
 ];
