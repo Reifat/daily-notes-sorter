@@ -10,7 +10,16 @@ function copyFile(src, dst) {
   fs.copyFileSync(src, dst);
 }
 
+function normalizeMode(input) {
+  if (!input) return 'Release';
+  const v = String(input).toLowerCase();
+  if (v === 'dev') return 'Dev';
+  if (v === 'release') return 'Release';
+  return 'Release';
+}
+
 function main() {
+  const mode = normalizeMode(process.argv[2]);
   const cwd = process.cwd();
   const manifestPath = path.join(cwd, 'manifest.json');
 
@@ -28,8 +37,9 @@ function main() {
     process.exit(1);
   }
 
-  const releaseDir = path.join(cwd, 'release');
-  ensureDir(releaseDir);
+  const buildRoot = path.join(cwd, 'build');
+  const outDir = path.join(buildRoot, mode === 'Dev' ? 'dev' : 'release');
+  ensureDir(outDir);
 
   // Files to include. styles.css is optional.
   const sourceFiles = [
@@ -50,9 +60,14 @@ function main() {
         continue;
       }
     }
-    const dst = path.join(releaseDir, path.basename(f.name));
+    const dst = path.join(outDir, path.basename(f.name));
     copyFile(src, dst);
     filesToZip.push(dst);
+  }
+
+  if (mode === 'Dev') {
+    console.log(`[build] Dev artifacts prepared at: ${outDir}`);
+    return;
   }
 
   if (filesToZip.length === 0) {
@@ -60,20 +75,17 @@ function main() {
     process.exit(1);
   }
 
-  // Archive name: <id>-<version>.zip
+  // Archive name: <id>-<version>.zip in build/release
   const zipName = `${pluginId}-${pluginVersion}.zip`;
-  const zipPath = path.join(releaseDir, zipName);
+  const zipPath = path.join(outDir, zipName);
 
-  // Remove existing archive if present
-  if (fs.existsSync(zipPath)) {
-    fs.unlinkSync(zipPath);
-  }
+  if (fs.existsSync(zipPath)) fs.unlinkSync(zipPath);
 
   const output = fs.createWriteStream(zipPath);
   const archive = archiver('zip', { zlib: { level: 9 } });
 
   output.on('close', () => {
-    console.log(`Archive ready: ${zipPath} (${archive.pointer()} total bytes)`);
+    console.log(`[build] Release archive ready: ${zipPath} (${archive.pointer()} bytes)`);
   });
   output.on('error', (err) => {
     console.error(err);
@@ -85,12 +97,9 @@ function main() {
   });
 
   archive.pipe(output);
-
-  // Put files into the root of the archive
   for (const filePath of filesToZip) {
     archive.file(filePath, { name: path.basename(filePath) });
   }
-
   archive.finalize();
 }
 

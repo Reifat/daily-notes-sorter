@@ -21,4 +21,9 @@ data.json
 # Exclude macOS Finder (System Explorer) View States
 .DS_Store
 
-release/*
+build/*
+
+# install config
+install-config.env
+# install config example
+!scripts/install/env-example/install-config.env

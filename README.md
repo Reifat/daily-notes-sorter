@@ -43,12 +43,23 @@ An Obsidian plugin that allows you to automatically sort daily notes by date in 
 4. Click **Browse** and search for "Daily notes sorter"
 5. Click **Install** and then **Enable**
 
-#### Manual Installation
+#### Manual Installation (without working with the repository)
 
-1. Download the latest release from the [GitHub repository](https://github.com/Reifat/daily-notes-sorter) (or clone the repository)
-2. Copy the files `main.js`, `manifest.json`, and `styles.css` to `.obsidian/plugins/daily-notes-sorter/` folder in your vault
-3. Reload Obsidian
-4. Enable the plugin in Obsidian settings (Settings → Community plugins)
+1. Download the latest release from the Releases page:
+   - `https://github.com/Reifat/daily-notes-sorter/releases/latest`
+2. In the release assets, download and unzip “Source code (zip)”.
+3. From the unpacked archive, move `scripts/install/env-example/install-config.env` into the root of the plugin folder (next to `README.md`).
+4. Open `install-config.env` and set:
+   - `DEST_DIR` — absolute path to your vault’s plugin folder, e.g. `/path/to/YourVault/.obsidian/plugins/daily-notes-sorter`
+   - `RELEASE_TAG` — the release tag you want to install (e.g. `1.0.0`)
+5. Run the installer for your platform:
+   - macOS: `bash scripts/install/install.sh` (make executable if needed: `chmod +x scripts/install/install.sh scripts/install/install.command`)
+   - Windows: `scripts\install\install.bat`
+   - macOS (double-click): `scripts/install/install.command`
+
+Notes:
+- On macOS, if blocked by Gatekeeper, run: `xattr -r -d com.apple.quarantine scripts/install`
+- Windows `.bat` files do not require execution permissions; ensure the file isn’t blocked in Properties if SmartScreen warns.
 
 ### Configuration
 

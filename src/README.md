@@ -179,7 +179,17 @@ npm install
 npm run dev
 ```
 
-This command starts build in watch mode, automatically rebuilding the plugin when source files change.
+This command starts esbuild in watch mode and automatically rebuilds on source changes.
+
+Local auto-install during development:
+- Create `install-config.env` in the repository root with at least:
+  ```bash
+  DEST_DIR=/absolute/path/to/YourVault/.obsidian/plugins/daily-notes-sorter
+  ```
+  `RELEASE_TAG` is not required for dev installs.
+- While `npm run dev` is running, on each successful rebuild the dev workflow:
+  - Builds artifacts into `build/dev` via `scripts/build.js Dev`
+  - Installs them into `DEST_DIR` via `scripts/install.js Dev` (delegates to `scripts/install/install.(sh|bat)`)
 
 ### Production Build
 
@@ -187,11 +197,77 @@ This command starts build in watch mode, automatically rebuilding the plugin whe
 npm run build
 ```
 
+This produces the compiled `main.js` in repo root. To create a distributable zip and stage release artifacts:
+
+```bash
+npm run release
+```
+
+What `release` does:
+- format → lint → build
+- runs `node scripts/build.js Release`:
+  - copies `main.js`, `manifest.json`, `styles.css` into `build/release/`
+  - creates `<plugin-id>-<version>.zip` inside `build/release/`
+
+### NPM Scripts Reference
+
+- `npm run dev`
+  - Runs esbuild in watch mode and on each successful rebuild:
+    - builds dev artifacts to `build/dev`
+    - installs them to `DEST_DIR` via `scripts/install.js Dev`
+- `npm run build`
+  - Type-checks with `tsc` (no emit) and builds production bundle (`main.js`)
+- `npm run release`
+  - Runs: `format` → `lint` → `build` → `node scripts/build.js Release`
+  - Produces `<plugin-id>-<version>.zip` in `build/release/`
+- `npm run lint`
+  - ESLint over the repo. Fails on warnings (`--max-warnings=0`)
+- `npm run lint:fix`
+  - ESLint with auto-fix (`--fix`)
+- `npm run format`
+  - Prettier write formatting (`prettier --write .`)
+- `npm run format:check`
+  - Prettier check mode (`prettier --check .`)
+- `npm run install:release`
+  - Installs plugin from local `build/release` artifacts into `DEST_DIR`
+  - Requires `install-config.env` with `DEST_DIR`
+  - Note: does not download from GitHub; for download-and-install use platform script without arguments:
+    - macOS/Linux: `bash scripts/install/install.sh`
+    - Windows: `scripts\install\install.bat`
+
 ### Build Structure
 
 - `main.js` — compiled JavaScript plugin file
 - `styles.css` — styles for UI components
 - `manifest.json` — plugin manifest with metadata
+
+### Install Scripts (manual/local)
+
+Install scripts live in `scripts/install/`:
+- `install.sh` (Unix/macOS)
+- `install.bat` (Windows)
+- `install.command` (macOS double-click wrapper)
+
+Configuration:
+- Create `install-config.env` in repository root:
+  ```bash
+  # Required for any install
+  DEST_DIR=/absolute/path/to/YourVault/.obsidian/plugins/daily-notes-sorter
+  # Required only for download-and-install mode
+  RELEASE_TAG=1.0.0
+  ```
+
+Usage:
+- Download-and-install from GitHub Releases (uses `RELEASE_TAG`):
+  - macOS/Linux: `bash scripts/install/install.sh`
+  - Windows: `scripts\install\install.bat`
+- Install from local build output:
+  - Release: `bash scripts/install/install.sh Release` or `scripts\install\install.bat Release`
+  - Dev: `bash scripts/install/install.sh Dev` or `scripts\install\install.bat Dev`
+
+Details:
+- Downloaded archives are cached in `build/release/<RELEASE_TAG>/extracted`
+- No marker files are required; install path is computed from `RELEASE_TAG`
 
 ## Implementation Details
 

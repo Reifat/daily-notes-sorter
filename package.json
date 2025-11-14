@@ -10,7 +10,8 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "release": "npm run format && npm run lint && npm run build && node scripts/release.js"
+    "release": "npm run format && npm run lint && npm run build && node scripts/build.js Release",
+    "install:release": "node scripts/install.js Release"
   },
   "keywords": [
     "obsidian",
