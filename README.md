@@ -4,7 +4,15 @@ An Obsidian plugin that allows you to automatically sort daily notes by date in 
 
 ## Description
 
-**Daily Notes Sorter** is an Obsidian plugin that extends the file explorer functionality by adding the ability to automatically sort files by date in specified folders. The plugin analyzes file names, extracts dates according to the specified format, and sorts files in chronological order.
+Tired of your daily notes jumping out of order? When your note names consist of a date (for example, `15.01.2024`, `01/15/2024`), Obsidian’s file explorer often can’t sort them chronologically. Daily Notes Sorter understands popular regional date formats and keeps your notes exactly where you expect them—newest first or oldest first, on demand.
+
+![Before → After (left to right)](https://github.com/Reifat/daily-notes-sorter/blob/main/resources/src%26after.png)
+
+### Demo
+
+Curious how it works in practice? In this short clip, you’ll see how to add a folder, pick the date format, and toggle the sort to instantly re-order your daily notes:
+
+![Plugin demo](https://github.com/Reifat/daily-notes-sorter/blob/main/resources/demo.gif)
 
 ## Features
 
