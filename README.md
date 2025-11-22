@@ -26,6 +26,7 @@ Curious how it works in practice? In this short clip, you’ll see how to add a 
   - `DD.MM.YYYY` (European format, e.g.: 15.01.2024)
   - `DD.MM.YY` (European short format, e.g.: 15.01.24)
   - `MM/DD/YYYY` (US format, e.g.: 01/15/2024)
+  - For numeric formats, the separator must be a single, uniform character that is not a letter or digit (space, dot, dash, underscore, etc.); only the order matters. Examples: `DD-MM-YYYY`, `DD MM YYYY`, `YYYY.MM.DD`, `MM-DD-YYYY`. Multiple or mixed separators (e.g., `15--01--2024`, `15-01_2024`) will not match. Textual formats remain unchanged (e.g., `Aug 15 2024`).
 
 ### 🔄 Sort Direction
 - Ascending sort (from old to new)

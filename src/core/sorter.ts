@@ -168,11 +168,12 @@ export class Sorter {
     switch (dateFormat) {
       case 'YYYY-MM-DD': {
         // Format: 2024-01-15 (search at the beginning of string)
-        match = fileName.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+        // Require exactly one non-alphanumeric separator and it must be the same between components
+        match = fileName.match(/^(\d{4})([^A-Za-z0-9])(\d{1,2})\2(\d{1,2})/);
         if (match) {
           year = match[1];
-          month = match[2];
-          day = match[3];
+          month = match[3];
+          day = match[4];
         } else {
           // Try textual date fallback with the same order and spaces: "YYYY Month DD"
           return this.parseTextualDate(fileName, ['y', 'm', 'd'], 4);
@@ -181,11 +182,12 @@ export class Sorter {
       }
       case 'DD.MM.YYYY': {
         // Format: 15.01.2024 (search at the beginning of string)
-        match = fileName.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})/);
+        // Require exactly one non-alphanumeric separator and it must be the same between components
+        match = fileName.match(/^(\d{1,2})([^A-Za-z0-9])(\d{1,2})\2(\d{4})/);
         if (match) {
           day = match[1];
-          month = match[2];
-          year = match[3];
+          month = match[3];
+          year = match[4];
         } else {
           // Try textual date fallback with the same order and spaces: "DD Month YYYY"
           return this.parseTextualDate(fileName, ['d', 'm', 'y'], 4);
@@ -194,14 +196,15 @@ export class Sorter {
       }
       case 'DD.MM.YY': {
         // Format: 15.01.24 (search at the beginning of string)
-        match = fileName.match(/^(\d{1,2})\.(\d{1,2})\.(\d{2})/);
+        // Require exactly one non-alphanumeric separator and it must be the same between components
+        match = fileName.match(/^(\d{1,2})([^A-Za-z0-9])(\d{1,2})\2(\d{2})/);
         if (match) {
           day = match[1];
-          month = match[2];
-          const yy = parseInt(match[3], 10);
+          month = match[3];
+          const yy = parseInt(match[4], 10);
           // Convert two-digit year to four-digit
           // YY < 50 -> 20YY, otherwise 19YY
-          year = yy < 50 ? `20${match[3]}` : `19${match[3]}`;
+          year = yy < 50 ? `20${match[4]}` : `19${match[4]}`;
         } else {
           // Try textual date fallback with the same order and spaces: "DD Month YY"
           return this.parseTextualDate(fileName, ['d', 'm', 'y'], 2);
@@ -210,11 +213,12 @@ export class Sorter {
       }
       case 'MM/DD/YYYY': {
         // Format: 01/15/2024 (search at the beginning of string)
-        match = fileName.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+        // Require exactly one non-alphanumeric separator and it must be the same between components
+        match = fileName.match(/^(\d{1,2})([^A-Za-z0-9])(\d{1,2})\2(\d{4})/);
         if (match) {
           month = match[1];
-          day = match[2];
-          year = match[3];
+          day = match[3];
+          year = match[4];
         } else {
           // Try textual date fallback with the same order and spaces: "Month DD YYYY"
           return this.parseTextualDate(fileName, ['m', 'd', 'y'], 4);

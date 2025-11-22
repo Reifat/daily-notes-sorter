@@ -26,6 +26,13 @@ describe('Sorter.extractDate via private access', () => {
     expect(d).toEqual({ day: 15, month: 1, year: 2024 });
   });
 
+  test('DD.MM.YYYY accepts any separator', () => {
+    expect(callExtract('15-01-2024', 'DD.MM.YYYY')).toEqual({ day: 15, month: 1, year: 2024 });
+    expect(callExtract('15 01 2024', 'DD.MM.YYYY')).toEqual({ day: 15, month: 1, year: 2024 });
+    expect(callExtract('15_01_2024', 'DD.MM.YYYY')).toEqual({ day: 15, month: 1, year: 2024 });
+    expect(callExtract('15.01.2024', 'DD.MM.YYYY')).toEqual({ day: 15, month: 1, year: 2024 });
+  });
+
   test('DD Month YYYY textual fallback', () => {
     const d = callExtract('15 Aug 2024', 'DD.MM.YYYY');
     expect(d).toEqual({ day: 15, month: 8, year: 2024 });
@@ -44,6 +51,32 @@ describe('Sorter.extractDate via private access', () => {
   test('DD Month YY textual fallback with 2-digit year', () => {
     const d = callExtract('15 Aug 24', 'DD.MM.YY');
     expect(d).toEqual({ day: 15, month: 8, year: 2024 });
+  });
+
+  test('YYYY-MM-DD accepts any separator', () => {
+    expect(callExtract('2024.01.15', 'YYYY-MM-DD')).toEqual({ day: 15, month: 1, year: 2024 });
+    expect(callExtract('2024 01 15', 'YYYY-MM-DD')).toEqual({ day: 15, month: 1, year: 2024 });
+    expect(callExtract('2024_01_15', 'YYYY-MM-DD')).toEqual({ day: 15, month: 1, year: 2024 });
+  });
+
+  test('Numeric formats require exactly one non-alphanumeric separator', () => {
+    // Double separators should NOT match
+    expect(callExtract('15--01--2024', 'DD.MM.YYYY')).toBeUndefined();
+    expect(callExtract('15  01  2024', 'DD.MM.YYYY')).toBeUndefined();
+    expect(callExtract('2024..01..15', 'YYYY-MM-DD')).toBeUndefined();
+    expect(callExtract('01__15__2024', 'MM/DD/YYYY')).toBeUndefined();
+    // Alphabetic between digits should NOT match
+    expect(callExtract('2024Jan15', 'YYYY-MM-DD')).toBeUndefined();
+    // Mixed separators should NOT match
+    expect(callExtract('15-01_2024', 'DD.MM.YYYY')).toBeUndefined();
+    expect(callExtract('2024.01-15', 'YYYY-MM-DD')).toBeUndefined();
+    expect(callExtract('01 15_2024', 'MM/DD/YYYY')).toBeUndefined();
+  });
+
+  test('MM/DD/YYYY accepts any separator (since / is not allowed in filenames)', () => {
+    expect(callExtract('01-15-2024', 'MM/DD/YYYY')).toEqual({ day: 15, month: 1, year: 2024 });
+    expect(callExtract('01 15 2024', 'MM/DD/YYYY')).toEqual({ day: 15, month: 1, year: 2024 });
+    expect(callExtract('01.15.2024', 'MM/DD/YYYY')).toEqual({ day: 15, month: 1, year: 2024 });
   });
 
   test('MM/DD/YYYY textual fallback "Month DD YYYY" (slashes not allowed in filenames)', () => {
