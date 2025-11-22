@@ -1,3 +1,4 @@
+/* eslint-env node */
 import esbuild from 'esbuild';
 import process from 'process';
 import builtins from 'builtin-modules';

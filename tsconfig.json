@@ -18,6 +18,6 @@
     "resolveJsonModule": true,
     "lib": ["ES2020", "DOM"]
   },
-  "include": ["**/*.ts"],
-  "exclude": ["node_modules", "main.js", "backup"]
+  "include": ["src/**/*.ts", "types/**/*.d.ts"],
+  "exclude": ["node_modules", "tests", "main.js", "backup", "build"]
 }

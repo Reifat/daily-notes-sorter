@@ -168,7 +168,32 @@ const tsStrictTypeChecked = tseslint.configs.strictTypeChecked.map((cfg) => ({
 
 export default [
   // Ignore build artifacts and non-source configs
-  { ignores: ['node_modules/**', 'release/**', 'main.js', 'eslint.config.js', 'scripts/**'] },
+  {
+    ignores: [
+      'node_modules/**',
+      'build/**',
+      'release/**',
+      'main.js',
+      'eslint.config.js',
+      'scripts/**',
+    ],
+  },
+
+  // Enable Node globals for JS config/build scripts
+  {
+    files: ['**/*.{js,mjs,cjs}'],
+    languageOptions: {
+      globals: {
+        console: 'readonly',
+        process: 'readonly',
+        __dirname: 'readonly',
+        __filename: 'readonly',
+        module: 'readonly',
+        require: 'readonly',
+        exports: 'readonly',
+      },
+    },
+  },
 
   // Base JS rules
   js.configs.recommended,
@@ -180,6 +205,10 @@ export default [
   {
     files: ['src/**/*.ts', 'src/**/*.tsx'],
     languageOptions: {
+      globals: {
+        console: 'readonly',
+        process: 'readonly',
+      },
       parserOptions: {
         project: './tsconfig.json',
         tsconfigRootDir: process.cwd(),
@@ -293,6 +322,19 @@ export default [
           alphabetize: { order: 'asc', caseInsensitive: true },
         },
       ],
+    },
+  },
+
+  // Relax unsafe-any style rules for Obsidian File Explorer integration points,
+  // which rely on untyped/loosely-typed internal APIs across app versions.
+  {
+    files: ['src/file-explorer-utils.ts', 'src/ui/explorer-ui.ts'],
+    rules: {
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+      '@typescript-eslint/no-unsafe-member-access': 'off',
+      '@typescript-eslint/no-unsafe-call': 'off',
+      '@typescript-eslint/no-unsafe-argument': 'off',
+      '@typescript-eslint/no-redundant-type-constituents': 'off',
     },
   },
 

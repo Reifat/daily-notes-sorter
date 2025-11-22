@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "node esbuild.config.mjs",
     "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+    "test": "jest",
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
@@ -27,6 +28,7 @@
     "monkey-around": "^3.0.0"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.14",
     "@eslint/js": "^9.39.1",
     "@types/node": "^20.0.0",
     "archiver": "^7.0.1",
@@ -37,8 +39,10 @@
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-obsidianmd": "^0.1.8",
     "eslint-plugin-unicorn": "^62.0.0",
+    "jest": "^29.7.0",
     "obsidian": "latest",
     "prettier": "^3.6.2",
+    "ts-jest": "^29.2.5",
     "typescript": "^5.3.0",
     "typescript-eslint": "^8.46.3"
   }
